@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -32,6 +36,47 @@ public class RabbitmqConfig {
 
     @Value("${spring.rabbitmq.password}")
     private String password; // 접속 비밀번호
+
+    private static final String BINDING_KEY = "test.key";
+    private static final String EXCHANGE_NAME = "test.exchange";
+    private static final String QUEUE_NAME = "queue";
+
+    /**
+     * direct Exchange 구성
+     *
+     * @return DirectExchange
+     */
+    @Bean
+    public DirectExchange directExchange() {
+        return new DirectExchange(EXCHANGE_NAME);
+    }
+
+    /**
+     * Queue 구성
+     *
+     * @return Queue
+     */
+    @Bean
+    public Queue queue() {
+        return new Queue(QUEUE_NAME);
+    }
+
+    /**
+     * Queue와 DirectExchange를 바인딩
+     * test.key라는 이름으로 바인딩 구성
+     *
+     * @param directExchange
+     * @param queue
+     * @return Binding
+     */
+    @Bean
+    public Binding binding(DirectExchange directExchange, Queue queue) {
+        // queue까지 가는 바인딩 Exchange 타입을 directExchange로 지정하고 test.key 이름으로 바인딩 구성
+        return BindingBuilder
+                .bind(queue)
+                .to(directExchange)
+                .with(BINDING_KEY);
+    }
 
     /**
      * RabbitMQ와 메시지 통신을 담당하는 클래스
