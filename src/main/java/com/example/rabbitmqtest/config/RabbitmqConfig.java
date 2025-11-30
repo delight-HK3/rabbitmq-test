@@ -64,23 +64,23 @@ public class RabbitmqConfig {
     }
 
     // 공통적으로 RabbitMQ가 재부팅되도 Queue 대기열에 남도록 설정
-    @Bean
-    public Queue directQueue() {
+    @Bean public Queue directQueue() {
         return new Queue(rabbitmqExchangeInfo.get_DIRECT_QUEUE_NAME(),true);
     }
 
-    @Bean
-    public Queue fanoutQueueOne() {
+    @Bean public Queue fanoutQueueOne() {
         return new Queue(rabbitmqExchangeInfo.get_FANOUT_QUEUE_NAME_ONE(), true);
     }
 
-    @Bean Queue fanoutQueueTwo() {
+    @Bean public Queue fanoutQueueTwo() {
         return new Queue(rabbitmqExchangeInfo.get_FANOUT_QUEUE_NAME_TWO(), true);
     }
 
-    @Bean Queue headersQueue() {
+    @Bean public Queue headersQueue() {
         return new Queue(rabbitmqExchangeInfo.get_HEADER_QUEUE_NAME(), false);
     }
+
+    @Bean public Queue topicQueue() { return new Queue(rabbitmqExchangeInfo.get_TOPIC_EXCHANGE_NAME(), false); }
 
     /**
      * Queue와 DirectExchange를 바인딩
@@ -94,6 +94,11 @@ public class RabbitmqConfig {
                 .with(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_KEY());
     }
 
+    /**
+     * Queue(fanoutQueueOne)와 FanoutExchange 바인딩
+     * Fanout 방식은 Exchange와 연결된 모든 Queue에 보내는 방식으로
+     * FanoutExchange와 연결된 fanoutQueueOne, fanoutQueueTwo에게 메세지를 보낸다.
+     */
     @Bean
     public Binding fanoutBindingOne(FanoutExchange fanoutExchange, @Qualifier("fanoutQueueOne") Queue queue) {
         return BindingBuilder
@@ -101,6 +106,11 @@ public class RabbitmqConfig {
                 .to(fanoutExchange);
     }
 
+    /**
+     * Queue(fanoutQueueTwo)와 FanoutExchange 바인딩
+     * Fanout 방식은 Exchange와 연결된 모든 Queue에 보내는 방식으로
+     * FanoutExchange와 연결된 fanoutQueueOne, fanoutQueueTwo에게 메세지를 보낸다.
+     */
     @Bean
     public Binding fanoutBindingTwo(FanoutExchange fanoutExchange, @Qualifier("fanoutQueueTwo") Queue queue) {
         return BindingBuilder
@@ -108,7 +118,30 @@ public class RabbitmqConfig {
                 .to(fanoutExchange);
     }
 
+    /**
+     * headers Exchange 와 headersQueue간 바인딩
+     * headersExchange 방식으로 headersQueue와 Header값을 조건으로 바인딩 수행
+     */
+    @Bean
+    public Binding headerBinding(HeadersExchange headersExchange, @Qualifier("headersQueue") Queue queue){
+        return BindingBuilder
+                .bind(queue)
+                .to(headersExchange)
+                .where("excute-key")
+                .exists();
+    }
 
+    /**
+     * topic Exchange 와 topicQueue간 바인딩
+     * producer에서 topic.send. 으로 시작하는 라우팅 키를 보내주면 라우팅 키 규칙과 같은 Exchange와 연결
+     */
+    @Bean
+    public Binding topicBinding(TopicExchange topicExchange, @Qualifier("topicQueue") Queue queue){
+        return BindingBuilder
+                .bind(queue)
+                .to(topicExchange)
+                .with("topic.send.*");
+    }
 
     /**
      * RabbitMQ와 메시지 통신을 담당하는 클래스
