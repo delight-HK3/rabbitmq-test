@@ -4,15 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +23,13 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class RabbitmqConfig {
 
+    private final RabbitmqExchangeInfo rabbitmqExchangeInfo;
+
     @Value("${spring.rabbitmq.host}")
-    private String host;     // 접속 호스트
+    private String host; // 접속 호스트
 
     @Value("${spring.rabbitmq.port}")
-    private Integer port;     // 접속 포트번호
+    private Integer port; // 접속 포트번호
 
     @Value("${spring.rabbitmq.username}")
     private String username; // 접속 아이디
@@ -37,46 +37,78 @@ public class RabbitmqConfig {
     @Value("${spring.rabbitmq.password}")
     private String password; // 접속 비밀번호
 
-    private static final String BINDING_KEY = "test.key";
-    private static final String EXCHANGE_NAME = "test.exchange";
-    private static final String QUEUE_NAME = "queue";
 
-    /**
-     * direct Exchange 구성
-     *
-     * @return DirectExchange
-     */
+    // 공통적으로 RabbitMQ가 재부팅되도 Exchange가 삭제안되고 동시에 대기열에 남도록 설정
     @Bean
     public DirectExchange directExchange() {
-        return new DirectExchange(EXCHANGE_NAME);
+        // DIRECT_EXCHANGE_NAME 이름의 direct Exchange 구성
+        return new DirectExchange(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_NAME(),true, false);
     }
 
-    /**
-     * Queue 구성
-     *
-     * @return Queue
-     */
     @Bean
-    public Queue queue() {
-        return new Queue(QUEUE_NAME);
+    public FanoutExchange fanoutExchange() {
+        // FANOUT_EXCHANGE_NAME 이름의 fanout Exchange 구성
+        return new FanoutExchange(rabbitmqExchangeInfo.get_FANOUT_EXCHANGE_NAME(),true, false);
+    }
+
+    @Bean
+    public TopicExchange topicExchange() {
+        // TOPIC_EXCHANGE_NAME 이름의 topic Exchange 구성
+        return new TopicExchange(rabbitmqExchangeInfo.get_TOPIC_EXCHANGE_NAME(), true, false);
+    }
+
+    @Bean
+    public HeadersExchange headersExchange() {
+        // HEADER_EXCHANGE_NAME 이름의 header Exchange 구성
+        return new HeadersExchange(rabbitmqExchangeInfo.get_HEADER_EXCHANGE_NAME(),true, false);
+    }
+
+    // 공통적으로 RabbitMQ가 재부팅되도 Queue 대기열에 남도록 설정
+    @Bean
+    public Queue directQueue() {
+        return new Queue(rabbitmqExchangeInfo.get_DIRECT_QUEUE_NAME(),true);
+    }
+
+    @Bean
+    public Queue fanoutQueueOne() {
+        return new Queue(rabbitmqExchangeInfo.get_FANOUT_QUEUE_NAME_ONE(), true);
+    }
+
+    @Bean Queue fanoutQueueTwo() {
+        return new Queue(rabbitmqExchangeInfo.get_FANOUT_QUEUE_NAME_TWO(), true);
+    }
+
+    @Bean Queue headersQueue() {
+        return new Queue(rabbitmqExchangeInfo.get_HEADER_QUEUE_NAME(), false);
     }
 
     /**
      * Queue와 DirectExchange를 바인딩
-     * test.key라는 이름으로 바인딩 구성
-     *
-     * @param directExchange
-     * @param queue
-     * @return Binding
      */
     @Bean
-    public Binding binding(DirectExchange directExchange, Queue queue) {
+    public Binding directBinding(DirectExchange directExchange, @Qualifier("directQueue") Queue queue) {
         // queue까지 가는 바인딩 Exchange 타입을 directExchange로 지정하고 test.key 이름으로 바인딩 구성
         return BindingBuilder
                 .bind(queue)
                 .to(directExchange)
-                .with(BINDING_KEY);
+                .with(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_KEY());
     }
+
+    @Bean
+    public Binding fanoutBindingOne(FanoutExchange fanoutExchange, @Qualifier("fanoutQueueOne") Queue queue) {
+        return BindingBuilder
+                .bind(queue)
+                .to(fanoutExchange);
+    }
+
+    @Bean
+    public Binding fanoutBindingTwo(FanoutExchange fanoutExchange, @Qualifier("fanoutQueueTwo") Queue queue) {
+        return BindingBuilder
+                .bind(queue)
+                .to(fanoutExchange);
+    }
+
+
 
     /**
      * RabbitMQ와 메시지 통신을 담당하는 클래스

@@ -21,7 +21,7 @@ public class MesssageService {
     }
 
     private static final String BINDING_KEY = "test.key";
-    private static final String EXCHANGE_NAME = "test.exchange";
+    private static final String DIRECT_EXCHANGE_NAME = "rabbit.direct"; // Direct Exchange 이름
 
     /**
      * 메세지 전송
@@ -32,7 +32,7 @@ public class MesssageService {
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             String objectToJson = objectMapper.writeValueAsString(messageDTO);
-            rabbitTemplate.convertAndSend(EXCHANGE_NAME, BINDING_KEY, objectToJson);
+            rabbitTemplate.convertAndSend(DIRECT_EXCHANGE_NAME, BINDING_KEY, objectToJson);
         } catch (JsonProcessingException ex) {
             log.error("parsing error : {}", ex.getMessage(), ex);
         }
