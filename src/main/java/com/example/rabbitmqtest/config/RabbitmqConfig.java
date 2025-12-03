@@ -127,7 +127,7 @@ public class RabbitmqConfig {
         return BindingBuilder
                 .bind(queue)
                 .to(headersExchange)
-                .where("excute-key")
+                .where("execute-key")
                 .exists();
     }
 
