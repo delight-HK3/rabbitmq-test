@@ -80,7 +80,7 @@ public class RabbitmqConfig {
         return new Queue(rabbitmqExchangeInfo.get_HEADER_QUEUE_NAME(), false);
     }
 
-    @Bean public Queue topicQueue() { return new Queue(rabbitmqExchangeInfo.get_TOPIC_EXCHANGE_NAME(), false); }
+    @Bean public Queue topicQueue() { return new Queue(rabbitmqExchangeInfo.get_TOPIC_QUEUE_NAME(), false); }
 
     /**
      * Queue와 DirectExchange를 바인딩
