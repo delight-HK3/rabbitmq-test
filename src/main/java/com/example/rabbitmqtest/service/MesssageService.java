@@ -1,5 +1,6 @@
 package com.example.rabbitmqtest.service;
 
+import com.example.rabbitmqtest.config.RabbitmqExchangeInfo;
 import com.example.rabbitmqtest.dto.MessageDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,28 +16,53 @@ import org.springframework.stereotype.Service;
 public class MesssageService {
 
     private final RabbitTemplate rabbitTemplate;
+    private final RabbitmqExchangeInfo rabbitmqExchangeInfo;
 
-    public MesssageService(RabbitTemplate rabbitTemplate) {
+    public MesssageService(RabbitTemplate rabbitTemplate, RabbitmqExchangeInfo rabbitmqExchangeInfo) {
         this.rabbitTemplate = rabbitTemplate;
+        this.rabbitmqExchangeInfo = rabbitmqExchangeInfo;
     }
 
-    private static final String BINDING_KEY = "test.key";
-    private static final String DIRECT_EXCHANGE_NAME = "rabbit.direct"; // Direct Exchange 이름
-
     /**
-     * 메세지 전송
+     * Direct Exchange 방식 메세지 전송
      *
      * @param messageDTO 메세지 DTO
+     * @return 성공 시 "success" 리턴
      */
-    public void sendMessage(MessageDTO messageDTO) {
+    public String sendDirectMessage(MessageDTO messageDTO) {
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             String objectToJson = objectMapper.writeValueAsString(messageDTO);
-            rabbitTemplate.convertAndSend(DIRECT_EXCHANGE_NAME, BINDING_KEY, objectToJson);
+
+            rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_NAME()
+                                        , rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_KEY()
+                                        , objectToJson);
         } catch (JsonProcessingException ex) {
             log.error("parsing error : {}", ex.getMessage(), ex);
         }
 
+        return "success";
+    }
+
+    /**
+     * Fanout Exchange 방식 메세지 전송
+     *
+     * @param messageDTO 메세지 DTO
+     * @return 성공 시 "success" 리턴
+     */
+    public String sendFanoutMessage(MessageDTO messageDTO){
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            String objectToJson = objectMapper.writeValueAsString(messageDTO);
+
+            rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_FANOUT_EXCHANGE_NAME()
+                                        , ""
+                                        , objectToJson);
+        } catch (JsonProcessingException ex) {
+            log.error("parsing error : {}", ex.getMessage(), ex);
+        }
+
+        return "success";
     }
 
 }

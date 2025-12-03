@@ -23,15 +23,40 @@ public class MessageController {
         this.messsageService = messsageService;
     }
 
-    @PostMapping("/send")
-    public ResponseEntity<?> sendMessage(@RequestBody MessageDTO messageDTO) {
-
-        messsageService.sendMessage(messageDTO);
+    /**
+     * Direct Exchange 방식으로 메세지 큐 전송
+     *
+     * @param messageDTO 메세지 DTO
+     * @return 메세지 성공 응답
+     */
+    @PostMapping("/direct")
+    public ResponseEntity<?> sendDirectMessage(@RequestBody MessageDTO messageDTO) {
+        String resultMessage = messsageService.sendDirectMessage(messageDTO);
         ApiResponse ar  = ApiResponse.builder()
-                    .resultMsg(SuccessCode.SELECT.getMessage())
+                    .resultMsg(resultMessage)
                     .resultCode(SuccessCode.SELECT.getStatus())
                 .build();
 
         return new ResponseEntity<>(ar, HttpStatus.OK);
     }
+
+    /**
+     * Fanout Exchange 방식으로 메세지 큐 전송
+     *
+     * @param messageDTO 메세지 DTO
+     * @return 메세지 성공 응답
+     */
+    @PostMapping("/fanout")
+    public ResponseEntity<?> sendFanoutMessage(@RequestBody MessageDTO messageDTO){
+        String resultMessage = messsageService.sendFanoutMessage(messageDTO);
+        ApiResponse ar  = ApiResponse.builder()
+                .resultMsg(resultMessage)
+                .resultCode(SuccessCode.SELECT.getStatus())
+                .build();
+
+        return new ResponseEntity<>(ar, HttpStatus.OK);
+    }
+
+
+
 }
