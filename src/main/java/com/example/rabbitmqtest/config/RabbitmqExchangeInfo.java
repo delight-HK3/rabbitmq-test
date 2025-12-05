@@ -18,7 +18,7 @@ public class RabbitmqExchangeInfo {
     @Value("${rabbitmq.header.exchange.name}")
     private String HEAD_EXCHANGE_NAME; // header Exchange
 
-    @Value("${rabbitmq.topic.exhange.name}")
+    @Value("${rabbitmq.topic.exchange.name}")
     private String TOPIC_EXHANGE_NAME; // topic exchange
 
     @Value("${rabbitmq.direct.exchange.key}")
