@@ -11,29 +11,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class RabbitmqMessage {
 
-    @RabbitListener(queues = "directQueue")
+    @RabbitListener(queues = "direct.queue")
     public void directMessage(String message){
-        log.info("directQueue 내의 메시지 반환 : {}", message);
+        log.info("direct.queue 내의 메시지 반환 : {}", message);
     }
 
-    @RabbitListener(queues = "fanoutQueueOne")
+    @RabbitListener(queues = "fanout.queue.one")
     public void fanoutOneMessage(String message){
-        log.info("fanoutQueueOne 내의 메시지 반환 : {}", message);
+        log.info("fanout.queue.one 내의 메시지 반환 : {}", message);
     }
 
-    @RabbitListener(queues = "fanoutQueueTwo")
+    @RabbitListener(queues = "fanout.queue.two")
     public void fanoutTwoMessage(String message){
-        log.info("fanoutQueueTwo 내의 메시지 반환 : {}", message);
+        log.info("fanout.queue.two 내의 메시지 반환 : {}", message);
     }
 
-    @RabbitListener(queues = "headersQueue")
+    @RabbitListener(queues = "header.queue")
     public void headersMessage(String message){
-        log.info("headersQueue 내의 메시지 반환 : {}", message);
+        log.info("header.queue 내의 메시지 반환 : {}", message);
     }
 
-    @RabbitListener(queues = "topicQueue")
+    @RabbitListener(queues = "topic.queue")
     public void topicMessage(String message){
-        log.info("topicQueue 내의 메시지 반환 : {}", message);
+        log.info("topic.queue 내의 메시지 반환 : {}", message);
     }
 
 }
