@@ -27,7 +27,7 @@ public class MesssageService {
      * Direct Exchange 방식 메세지 전송
      *
      * @param messageDTO 메세지 DTO
-     * @return 성공 시 "success" 리턴
+     * @return 성공 시 "success_direct" 리턴
      */
     public String sendDirectMessage(MessageDTO messageDTO) {
         try{
@@ -41,14 +41,14 @@ public class MesssageService {
             log.error("parsing error : {}", ex.getMessage(), ex);
         }
 
-        return "success";
+        return "success_direct";
     }
 
     /**
      * Fanout Exchange 방식 메세지 전송
      *
      * @param messageDTO 메세지 DTO
-     * @return 성공 시 "success" 리턴
+     * @return 성공 시 "success_fanout" 리턴
      */
     public String sendFanoutMessage(MessageDTO messageDTO){
         try{
@@ -62,7 +62,49 @@ public class MesssageService {
             log.error("parsing error : {}", ex.getMessage(), ex);
         }
 
-        return "success";
+        return "success_fanout";
+    }
+
+    /**
+     * Topic Exchange 방식 메세지 전송
+     *
+     * @param messageDTO 메세지 DTO
+     * @return 성공 시 "success_topic" 리턴
+     */
+    public String sendTopicMessage(MessageDTO messageDTO){
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            String objectToJson = objectMapper.writeValueAsString(messageDTO);
+
+            rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_TOPIC_EXCHANGE_NAME()
+                                            ,"topic.send.test"
+                                            ,objectToJson);
+        } catch (JsonProcessingException ex) {
+            log.error("parsing error : {}", ex.getMessage(), ex);
+        }
+
+        return "success_topic";
+    }
+
+    /**
+     * Header Exchange 방식 메세지 전송
+     *
+     * @param messageDTO 메세지 DTO
+     * @return 성공 시 "success_header" 리턴
+     */
+    public String sendHeaderMessage(MessageDTO messageDTO){
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            String objectToJson = objectMapper.writeValueAsString(messageDTO);
+
+            rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_HEADER_EXCHANGE_NAME()
+                    ,""
+                    ,objectToJson);
+        } catch (JsonProcessingException ex) {
+            log.error("parsing error : {}", ex.getMessage(), ex);
+        }
+
+        return "success_header";
     }
 
 }

@@ -1,11 +1,10 @@
 package com.example.rabbitmqtest.controller;
 
-import com.example.rabbitmqtest.common.codes.SuccessCode;
 import com.example.rabbitmqtest.common.response.ApiResponse;
 import com.example.rabbitmqtest.dto.MessageDTO;
 import com.example.rabbitmqtest.service.MesssageService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,14 +29,10 @@ public class MessageController {
      * @return 메세지 성공 응답
      */
     @PostMapping("/direct")
-    public ResponseEntity<?> sendDirectMessage(@RequestBody MessageDTO messageDTO) {
+    public ResponseEntity<ApiResponse> sendDirectMessage(@RequestBody MessageDTO messageDTO) {
         String resultMessage = messsageService.sendDirectMessage(messageDTO);
-        ApiResponse ar  = ApiResponse.builder()
-                    .resultMsg(resultMessage)
-                    .resultCode(SuccessCode.SELECT.getStatus())
-                .build();
 
-        return new ResponseEntity<>(ar, HttpStatus.OK);
+        return ApiResponse.success(resultMessage,200);
     }
 
     /**
@@ -47,16 +42,36 @@ public class MessageController {
      * @return 메세지 성공 응답
      */
     @PostMapping("/fanout")
-    public ResponseEntity<?> sendFanoutMessage(@RequestBody MessageDTO messageDTO){
+    public ResponseEntity<ApiResponse> sendFanoutMessage(@RequestBody MessageDTO messageDTO){
         String resultMessage = messsageService.sendFanoutMessage(messageDTO);
-        ApiResponse ar  = ApiResponse.builder()
-                .resultMsg(resultMessage)
-                .resultCode(SuccessCode.SELECT.getStatus())
-                .build();
 
-        return new ResponseEntity<>(ar, HttpStatus.OK);
+        return ApiResponse.success(resultMessage, 200);
     }
 
+    /**
+     * Topic Exchange 방식으로 메세지 큐 전송
+     *
+     * @param messageDTO 메세지 DTO
+     * @return 메세지 성공 응답
+     */
+    @PostMapping("/topic")
+    public ResponseEntity<ApiResponse> sendTopicMessage(@RequestBody MessageDTO messageDTO){
+        String resultMessage = messsageService.sendTopicMessage(messageDTO);
 
+        return ApiResponse.success(resultMessage, 200);
+    }
+
+    /**
+     * Header Exchange 방식으로 메세지 큐 전송
+     *
+     * @param messageDTO 메세지 DTO
+     * @return 메세지 성공 응답
+     */
+    @PostMapping("/header")
+    public ResponseEntity<ApiResponse> sendHeaderMessage(@RequestBody MessageDTO messageDTO){
+        String resultMessage = messsageService.sendHeaderMessage(messageDTO);
+
+        return ApiResponse.success(resultMessage, 200);
+    }
 
 }
