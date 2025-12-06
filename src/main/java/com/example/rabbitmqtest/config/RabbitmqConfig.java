@@ -1,17 +1,7 @@
 package com.example.rabbitmqtest.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitmqConfig {
 
     private final RabbitmqExchangeInfo rabbitmqExchangeInfo;
-
 
     // 공통적으로 RabbitMQ가 재부팅되도 Exchange가 삭제안되고 동시에 대기열에 남도록 설정
     @Bean
@@ -88,7 +77,7 @@ public class RabbitmqConfig {
      * Queue와 DirectExchange를 바인딩
      */
     @Bean
-    public Binding directBinding(DirectExchange directExchange, @Qualifier("directQueue") Queue directQueue) {
+    public Binding directBinding(DirectExchange directExchange, Queue directQueue) {
         // queue까지 가는 바인딩 Exchange 타입을 directExchange로 지정하고 test.key 이름으로 바인딩 구성
         return BindingBuilder
                 .bind(directQueue)
@@ -129,8 +118,8 @@ public class RabbitmqConfig {
         return BindingBuilder
                 .bind(headersQueue)
                 .to(headersExchange)
-                .where("execute-key")
-                .exists();
+                .where("x-execute-key").matches(true);
+                // x-execute-key에 들어온 모든 값을 허용한다는 의미
     }
 
     /**
