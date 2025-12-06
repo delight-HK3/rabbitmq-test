@@ -49,19 +49,6 @@ public class MessageController {
     }
 
     /**
-     * Topic Exchange 방식으로 메세지 큐 전송
-     *
-     * @param messageDTO 메세지 DTO
-     * @return 메세지 성공 응답
-     */
-    @PostMapping("/topic")
-    public ResponseEntity<ApiResponse> sendTopicMessage(@RequestBody MessageDTO messageDTO){
-        String resultMessage = messsageService.sendTopicMessage(messageDTO);
-
-        return ApiResponse.success(resultMessage, 200);
-    }
-
-    /**
      * Header Exchange 방식으로 메세지 큐 전송
      *
      * @param messageDTO 메세지 DTO
@@ -70,6 +57,19 @@ public class MessageController {
     @PostMapping("/header")
     public ResponseEntity<ApiResponse> sendHeaderMessage(@RequestBody MessageDTO messageDTO){
         String resultMessage = messsageService.sendHeaderMessage(messageDTO);
+
+        return ApiResponse.success(resultMessage, 200);
+    }
+
+    /**
+     * Topic Exchange 방식으로 메세지 큐 전송
+     *
+     * @param messageDTO 메세지 DTO
+     * @return 메세지 성공 응답
+     */
+    @PostMapping("/topic")
+    public ResponseEntity<ApiResponse> sendTopicMessage(@RequestBody MessageDTO messageDTO){
+        String resultMessage = messsageService.sendTopicMessage(messageDTO);
 
         return ApiResponse.success(resultMessage, 200);
     }
