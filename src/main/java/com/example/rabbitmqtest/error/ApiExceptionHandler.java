@@ -37,7 +37,8 @@ public class ApiExceptionHandler {
     @ExceptionHandler(AmqpConnectException.class)
     public ResponseEntity<ApiResponse> handleAmqpConnectException(AmqpConnectException ex) {
         log.error("AMQP connect error : {}", ex.getMessage(), ex);
-        return ApiResponse.fail(ex.getMessage(), ExceptionCode.RABBITMQ_CONNECTION_FAILED.getCode());
+        return ApiResponse.fail(ExceptionCode.RABBITMQ_CONNECTION_FAILED.getMessage()
+                                , ExceptionCode.RABBITMQ_CONNECTION_FAILED.getCode());
     }
 
 }

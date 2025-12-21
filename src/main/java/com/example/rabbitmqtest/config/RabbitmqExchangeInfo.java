@@ -19,7 +19,7 @@ public class RabbitmqExchangeInfo {
     private String HEAD_EXCHANGE_NAME; // header Exchange
 
     @Value("${rabbitmq.topic.exchange.name}")
-    private String TOPIC_EXHANGE_NAME; // topic exchange
+    private String TOPIC_EXCHANGE_NAME; // topic exchange
 
     @Value("${rabbitmq.direct.exchange.key}")
     private String DIRECT_EXCHANGE_KEY; // direct Exchange Key
@@ -53,7 +53,7 @@ public class RabbitmqExchangeInfo {
     }
 
     public String get_TOPIC_EXCHANGE_NAME() {
-        return TOPIC_EXHANGE_NAME;
+        return TOPIC_EXCHANGE_NAME;
     }
 
     public String get_DIRECT_EXCHANGE_KEY() {
