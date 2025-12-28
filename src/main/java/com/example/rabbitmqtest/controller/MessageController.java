@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 일반적인 Message 전송
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/publisher")
