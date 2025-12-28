@@ -30,8 +30,8 @@ public class MesssageService {
      * @return 성공 시 "success_direct" 리턴
      */
     public String sendDirectMessage(MessageDTO messageDTO) {
+        ObjectMapper objectMapper = new ObjectMapper();
         try{
-            ObjectMapper objectMapper = new ObjectMapper();
             String objectToJson = objectMapper.writeValueAsString(messageDTO);
 
             rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_NAME()
@@ -51,8 +51,8 @@ public class MesssageService {
      * @return 성공 시 "success_fanout" 리턴
      */
     public String sendFanoutMessage(MessageDTO messageDTO){
+        ObjectMapper objectMapper = new ObjectMapper();
         try{
-            ObjectMapper objectMapper = new ObjectMapper();
             String objectToJson = objectMapper.writeValueAsString(messageDTO);
 
             rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_FANOUT_EXCHANGE_NAME()
@@ -72,8 +72,8 @@ public class MesssageService {
      * @return 성공 시 "success_topic" 리턴
      */
     public String sendTopicMessage(MessageDTO messageDTO){
+        ObjectMapper objectMapper = new ObjectMapper();
         try{
-            ObjectMapper objectMapper = new ObjectMapper();
             String objectToJson = objectMapper.writeValueAsString(messageDTO);
 
             rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_TOPIC_EXCHANGE_NAME()
@@ -93,8 +93,8 @@ public class MesssageService {
      * @return 성공 시 "success_header" 리턴
      */
     public String sendHeaderMessage(MessageDTO messageDTO){
+        ObjectMapper objectMapper = new ObjectMapper();
         try{
-            ObjectMapper objectMapper = new ObjectMapper();
             String objectToJson = objectMapper.writeValueAsString(messageDTO);
 
             rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_HEADER_EXCHANGE_NAME()
