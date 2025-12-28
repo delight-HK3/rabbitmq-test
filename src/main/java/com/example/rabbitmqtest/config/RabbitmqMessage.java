@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class RabbitmqMessage {
 
-    @RabbitListener(queues = "direct.queue")
-    public void directMessage(String message){
-        log.info("direct.queue 내의 메시지 반환 : {}", message);
-    }
+    //@RabbitListener(queues = "direct.queue")
+    //public void directMessage(String message){
+    //    log.info("direct.queue 내의 메시지 반환 : {}", message);
+    //}
 
     @RabbitListener(queues = "fanout.queue.one")
     public void fanoutOneMessage(String message){
