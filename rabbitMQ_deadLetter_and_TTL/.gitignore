@@ -5,6 +5,7 @@
 application-oauth2-loc.yml
 application-oauth2.yml
 
+.properties
 .gradle
 /build
 .idea
