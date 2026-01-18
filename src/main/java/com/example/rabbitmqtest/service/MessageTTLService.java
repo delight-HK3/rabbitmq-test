@@ -33,16 +33,24 @@ public class MessageTTLService {
      * @return 성공 시 "success_direct" 리턴
      */
     public String sendDirectTTLMessage(MessageDTO messageDTO) {
-        rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_NAME()
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // DTO -> String 직렬화 수행
+            String objectToJSON = objectMapper.writeValueAsString(messageDTO);
+
+            // 라우터를 기반으로 큐에 메시지 전송
+            rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_NAME()
                                         , rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_KEY()
-                                        , messageDTO
+                                        , objectToJSON
                                         , message -> {
                                             message.getMessageProperties().setExpiration("5000");
                                             return message;
                                         });
+        } catch (JsonProcessingException ex) {
+            log.error("parsing error : {}", ex.getMessage(), ex);
+        }
 
-        return "success_direct";
-
+        return "success_ttl_direct";
     }
 
 }
