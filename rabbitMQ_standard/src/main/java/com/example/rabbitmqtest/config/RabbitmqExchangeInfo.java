@@ -27,9 +27,6 @@ public class RabbitmqExchangeInfo {
     @Value("${rabbitmq.direct.queue.name}")
     private String DIRECT_QUEUE_NAME;   // direct Queue name
 
-    @Value("${rabbitmq.dead.queue.name}")
-    private String DEAD_QUEUE_NAME;     // dead Queue name
-
     @Value("${rabbitmq.fanout.queue.name.one}")
     private String FANOUT_QUEUE_NAME_ONE;   // fanout queue one
 
@@ -82,6 +79,4 @@ public class RabbitmqExchangeInfo {
     public String get_TOPIC_QUEUE_NAME() {
         return TOPIC_QUEUE_NAME;
     }
-
-    public String get_DEAD_QUEUE_NAME() { return DEAD_QUEUE_NAME; }
 }
