@@ -50,7 +50,15 @@ public class RabbitmqConfig {
     // 공통적으로 RabbitMQ가 재부팅되도 Queue 대기열에 남도록 설정
     @Bean
     public Queue directQueue() {
-        return new Queue(rabbitmqExchangeInfo.get_DIRECT_QUEUE_NAME(), true);
+        // TTL 설정이 미포함된 Queue
+        //return new Queue(rabbitmqExchangeInfo.get_DIRECT_QUEUE_NAME(), true);
+
+        // TTL 설정이 포함된 Queue
+        // QueueBuilder에 durable 메서드 안에 Queue이름을 넣으면
+        // RabbitMQ가 재부팅되도 Queue 대기열에 남는다.
+        return QueueBuilder.durable(rabbitmqExchangeInfo.get_DIRECT_QUEUE_NAME())
+                .withArgument("x-message-ttl", 3000)
+                .build();
     }
 
     @Bean
