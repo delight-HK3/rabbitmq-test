@@ -12,76 +12,49 @@ public class RabbitmqExchangeInfo {
     @Value("${rabbitmq.direct.exchange.name}")
     private String DIRECT_EXCHANGE_NAME; // direct Exchange
 
-    @Value("${rabbitmq.fanout.exchange.name}")
-    private String FANOUT_EXCHANGE_NAME; // fanout Exchange
+    @Value("${rabbitmq.direct.ttl.exchange.name}")
+    private String DIRECT_TTL_EXCHANGE_NAME; // direct TTL Exchange
 
-    @Value("${rabbitmq.header.exchange.name}")
-    private String HEAD_EXCHANGE_NAME; // header Exchange
-
-    @Value("${rabbitmq.topic.exchange.name}")
-    private String TOPIC_EXCHANGE_NAME; // topic exchange
-
-    @Value("${rabbitmq.direct.exchange.key}")
-    private String DIRECT_EXCHANGE_KEY; // direct Exchange Key
+    @Value("${rabbitmq.dead.exchange.name}")
+    private String FANOUT_EXCHANGE_NAME; // dead Exchange
 
     @Value("${rabbitmq.direct.queue.name}")
     private String DIRECT_QUEUE_NAME;   // direct Queue name
 
+    @Value("${rabbitmq.direct.ttl.queue.name}")
+    private String DIRECT_TTL_QUEUE_NAME;   // direct TTL Queue name
+
     @Value("${rabbitmq.dead.queue.name}")
     private String DEAD_QUEUE_NAME;     // dead Queue name
 
-    @Value("${rabbitmq.fanout.queue.name.one}")
-    private String FANOUT_QUEUE_NAME_ONE;   // fanout queue one
+    @Value("${rabbitmq.dead.routing.key}")
+    private String DEAD_ROUTING_KEY;    // dead Routing Key
 
-    @Value("${rabbitmq.fanout.queue.name.two}")
-    private String FANOUT_QUEUE_NAME_TWO;   // fanout queue two
+    @Value("${rabbitmq.direct.routing.key}")
+    private String DIRECT_ROUTING_KEY;  // direct Routing Key
 
-    @Value("${rabbitmq.header.queue.name}")
-    private String HEADER_QUEUE_NAME;         // header queue name
-
-    @Value("${rabbitmq.topic.queue.name}")
-    private String TOPIC_QUEUE_NAME;        // topic queue name
-
+    @Value("${rabbitmq.direct.ttl.routing.key}")
+    private String DIRECT_TTL_ROUTING_KEY;  // direct TTL Routing Key
 
     public String get_DIRECT_EXCHANGE_NAME() {
         return DIRECT_EXCHANGE_NAME;
     }
 
-    public String get_FANOUT_EXCHANGE_NAME() {
+    public String get_DIRECT_TTL_EXCHANGE_NAME() { return DIRECT_TTL_EXCHANGE_NAME; }
+
+    public String get_DEAD_EXCHANGE_NAME() {
         return FANOUT_EXCHANGE_NAME;
     }
 
-    public String get_HEADER_EXCHANGE_NAME() {
-        return HEAD_EXCHANGE_NAME;
-    }
+    public String get_DIRECT_QUEUE_NAME() {return DIRECT_QUEUE_NAME; }
 
-    public String get_TOPIC_EXCHANGE_NAME() {
-        return TOPIC_EXCHANGE_NAME;
-    }
-
-    public String get_DIRECT_EXCHANGE_KEY() {
-        return DIRECT_EXCHANGE_KEY;
-    }
-
-    public String get_DIRECT_QUEUE_NAME() {
-        return DIRECT_QUEUE_NAME;
-    }
-
-    public String get_FANOUT_QUEUE_NAME_ONE() {
-        return FANOUT_QUEUE_NAME_ONE;
-    }
-
-    public String get_FANOUT_QUEUE_NAME_TWO() {
-        return FANOUT_QUEUE_NAME_TWO;
-    }
-
-    public String get_HEADER_QUEUE_NAME() {
-        return HEADER_QUEUE_NAME;
-    }
-
-    public String get_TOPIC_QUEUE_NAME() {
-        return TOPIC_QUEUE_NAME;
-    }
+    public String get_DIRECT_TTL_QUEUE_NAME() { return DIRECT_TTL_QUEUE_NAME; }
 
     public String get_DEAD_QUEUE_NAME() { return DEAD_QUEUE_NAME; }
+
+    public String get_DEAD_ROUTING_KEY() { return DEAD_ROUTING_KEY; }
+
+    public String get_DIRECT_ROUTING_KEY() { return DIRECT_ROUTING_KEY; }
+
+    public String get_DIRECT_TTL_ROUTING_KEY() { return DIRECT_TTL_ROUTING_KEY; }
 }

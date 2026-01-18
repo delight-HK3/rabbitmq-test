@@ -14,132 +14,117 @@ public class RabbitmqConfig {
 
     private final RabbitmqExchangeInfo rabbitmqExchangeInfo;
 
-    // 공통적으로 RabbitMQ가 재부팅되도 Exchange가 삭제안되고 동시에 대기열에 남도록 설정
+    /**
+     * 메세지 성공을 못하는 경우 direct.queue로 라우팅하고 dead.queue로 이동
+     */
     @Bean
-    public DirectExchange directExchange() {
-        // DIRECT_EXCHANGE_NAME 이름의 direct Exchange 구성
+    public DirectExchange deadExchange(){
+        return ExchangeBuilder
+                .directExchange(rabbitmqExchangeInfo.get_DEAD_EXCHANGE_NAME())
+                .build();
+    }
+
+    /**
+     * Direct Exchange 구성 : direct.queue를 라우팅 하는데 사용
+     */
+    @Bean
+    public DirectExchange directExchange(){
         return ExchangeBuilder
                 .directExchange(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_NAME())
                 .build();
     }
 
+    /**
+     * Direct Exchange 구성 : direct.queue를 라우팅 하는데 사용
+     */
     @Bean
-    public FanoutExchange fanoutExchange() {
-        // FANOUT_EXCHANGE_NAME 이름의 fanout Exchange 구성
+    public DirectExchange directTTLExchange(){
         return ExchangeBuilder
-                .fanoutExchange(rabbitmqExchangeInfo.get_FANOUT_EXCHANGE_NAME())
+                .directExchange(rabbitmqExchangeInfo.get_DIRECT_TTL_EXCHANGE_NAME())
                 .build();
     }
 
+    /**
+     * deadQueue와 라우팅 키(Routing key)를 기반으로 바인딩 수행.
+     *
+     * @param deadQueue    성공적으로 처리하지 못한 메시지를 담는 공간
+     * @param deadExchange 성공적으로 처리하지 못한 메시지를 라우팅
+     */
     @Bean
-    public TopicExchange topicExchange() {
-        // TOPIC_EXCHANGE_NAME 이름의 topic Exchange 구성
-        return ExchangeBuilder
-                .topicExchange(rabbitmqExchangeInfo.get_TOPIC_EXCHANGE_NAME())
+    public Binding deadBinding(Queue deadQueue, DirectExchange deadExchange){
+        return BindingBuilder
+                .bind(deadQueue)
+                .to(deadExchange)
+                .with(rabbitmqExchangeInfo.get_DEAD_ROUTING_KEY());
+    }
+
+    /**
+     * Direct Exchange 와 direct Queue 간의 바인딩을 수행합니다.
+     *
+     * @param directQueue    메시지를 담을 큐
+     * @param directExchange 메시지를 담기 위한 라우팅
+     */
+    @Bean
+    public Binding directBinding(Queue directQueue, DirectExchange directExchange){
+        return BindingBuilder
+                .bind(directQueue)
+                .to(directExchange)
+                .with(rabbitmqExchangeInfo.get_DIRECT_ROUTING_KEY());
+    }
+
+    /**
+     * Direct Exchange (ttl) 와 direct Queue (ttl) 간의 바인딩을 수행합니다.
+     *
+     * @param directTTLQueue    메시지를 담을 큐
+     * @param directTTLExchange 메시지를 담기 위한 라우팅
+     */
+    @Bean
+    public Binding directTTLBinding(Queue directTTLQueue, DirectExchange directTTLExchange){
+        return BindingBuilder
+                .bind(directTTLQueue)
+                .to(directTTLExchange)
+                .with(rabbitmqExchangeInfo.get_DIRECT_TTL_ROUTING_KEY());
+    }
+
+    /**
+     * 만약 메세지 전송에 실패하면 해당 Queue(dead.queue) 로 이동
+     *
+     * @return dead Queue
+     */
+    @Bean
+    public Queue deadQueue(){
+        return new Queue(rabbitmqExchangeInfo.get_DEAD_QUEUE_NAME(), true);
+    }
+
+    /**
+     * directQueue 이름의 큐를 구성
+     * - 해당 큐에서는 속성 값으로 x-dead-letter-exchange가 발생시 rabbit.dead 로 라우팅
+     * - 해당 큐에서는 속성 값으로 x-dead-letter-routing-key를 통해 Direct Queue의 라우팅 키를 전달하여 라우팅
+     *
+     * @return direct Queue
+     */
+    @Bean
+    public Queue directQueue(){
+        return QueueBuilder.durable(rabbitmqExchangeInfo.get_DIRECT_QUEUE_NAME())
+                .withArgument("x-dead-letter-exchange", rabbitmqExchangeInfo.get_DEAD_EXCHANGE_NAME())
+                .withArgument("x-dead-letter-routing-key", rabbitmqExchangeInfo.get_DEAD_ROUTING_KEY())
                 .build();
     }
 
+    /**
+     * ttl 설정된 directQueue 이름의 큐를 구성
+     */
     @Bean
-    public HeadersExchange headersExchange() {
-        // HEADER_EXCHANGE_NAME 이름의 header Exchange 구성
-        return ExchangeBuilder
-                .headersExchange(rabbitmqExchangeInfo.get_HEADER_EXCHANGE_NAME())
-                .build();
-    }
-
-    // 공통적으로 RabbitMQ가 재부팅되도 Queue 대기열에 남도록 설정
-    @Bean
-    public Queue directQueue() {
+    public Queue directTTLQueue() {
         // TTL 설정이 미포함된 Queue
         //return new Queue(rabbitmqExchangeInfo.get_DIRECT_QUEUE_NAME(), true);
 
         // TTL 설정이 포함된 Queue
         // QueueBuilder에 durable 메서드 안에 Queue이름을 넣으면
         // RabbitMQ가 재부팅되도 Queue 대기열에 남는다.
-        return QueueBuilder.durable(rabbitmqExchangeInfo.get_DIRECT_QUEUE_NAME())
+        return QueueBuilder.durable(rabbitmqExchangeInfo.get_DIRECT_TTL_QUEUE_NAME())
                 .withArgument("x-message-ttl", 3000)
                 .build();
-    }
-
-    @Bean
-    public Queue fanoutQueueOne() {
-        return new Queue(rabbitmqExchangeInfo.get_FANOUT_QUEUE_NAME_ONE(), true);
-    }
-
-    @Bean
-    public Queue fanoutQueueTwo() {
-        return new Queue(rabbitmqExchangeInfo.get_FANOUT_QUEUE_NAME_TWO(), true);
-    }
-
-    @Bean
-    public Queue headersQueue() {
-        return new Queue(rabbitmqExchangeInfo.get_HEADER_QUEUE_NAME(), true);
-    }
-
-    @Bean
-    public Queue topicQueue() {
-        return new Queue(rabbitmqExchangeInfo.get_TOPIC_QUEUE_NAME(), true);
-    }
-
-    /**
-     * Queue와 DirectExchange를 바인딩
-     */
-    @Bean
-    public Binding directBinding(DirectExchange directExchange, Queue directQueue) {
-        // queue까지 가는 바인딩 Exchange 타입을 directExchange로 지정하고 test.key 이름으로 바인딩 구성
-        return BindingBuilder
-                .bind(directQueue)
-                .to(directExchange)
-                .with(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_KEY());
-    }
-
-    /**
-     * Queue(fanoutQueueOne)와 FanoutExchange 바인딩
-     * Fanout 방식은 Exchange와 연결된 모든 Queue에 보내는 방식으로
-     * FanoutExchange와 연결된 fanoutQueueOne, fanoutQueueTwo에게 메세지를 보낸다.
-     */
-    @Bean
-    public Binding fanoutBindingOne(FanoutExchange fanoutExchange, Queue fanoutQueueOne) {
-        return BindingBuilder
-                .bind(fanoutQueueOne)
-                .to(fanoutExchange);
-    }
-
-    /**
-     * Queue(fanoutQueueTwo)와 FanoutExchange 바인딩
-     * Fanout 방식은 Exchange와 연결된 모든 Queue에 보내는 방식으로
-     * FanoutExchange와 연결된 fanoutQueueOne, fanoutQueueTwo에게 메세지를 보낸다.
-     */
-    @Bean
-    public Binding fanoutBindingTwo(FanoutExchange fanoutExchange, Queue fanoutQueueTwo) {
-        return BindingBuilder
-                .bind(fanoutQueueTwo)
-                .to(fanoutExchange);
-    }
-
-    /**
-     * headers Exchange 와 headersQueue간 바인딩
-     * headersExchange 방식으로 headersQueue와 Header값을 조건으로 바인딩 수행
-     */
-    @Bean
-    public Binding headerBinding(HeadersExchange headersExchange, Queue headersQueue){
-        return BindingBuilder
-                .bind(headersQueue)
-                .to(headersExchange)
-                .where("x-execute-key").matches(true);
-                // x-execute-key에 들어온 모든 값을 허용한다는 의미
-    }
-
-    /**
-     * topic Exchange 와 topicQueue간 바인딩
-     * producer에서 topic.send. 으로 시작하는 라우팅 키를 보내주면 라우팅 키 규칙과 같은 Exchange와 연결
-     */
-    @Bean
-    public Binding topicBinding(TopicExchange topicExchange, Queue topicQueue){
-        return BindingBuilder
-                .bind(topicQueue)
-                .to(topicExchange)
-                .with("topic.send.*");
     }
 
 }

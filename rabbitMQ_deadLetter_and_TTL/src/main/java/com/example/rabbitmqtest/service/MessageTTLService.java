@@ -30,7 +30,7 @@ public class MessageTTLService {
      * Direct Exchange 방식 메세지에 추가로 TTL시간을 설정하여 전송
      *
      * @param messageDTO 메세지 DTO
-     * @return 성공 시 "success_direct" 리턴
+     * @return 성공 시 "success_ttl_direct" 리턴
      */
     public String sendDirectTTLMessage(MessageDTO messageDTO) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -39,8 +39,8 @@ public class MessageTTLService {
             String objectToJSON = objectMapper.writeValueAsString(messageDTO);
 
             // 라우터를 기반으로 큐에 메시지 전송
-            rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_NAME()
-                                        , rabbitmqExchangeInfo.get_DIRECT_EXCHANGE_KEY()
+            rabbitTemplate.convertAndSend(rabbitmqExchangeInfo.get_DIRECT_TTL_EXCHANGE_NAME()
+                                        , rabbitmqExchangeInfo.get_DIRECT_TTL_ROUTING_KEY()
                                         , objectToJSON
                                         , message -> {
                                             message.getMessageProperties().setExpiration("5000");
