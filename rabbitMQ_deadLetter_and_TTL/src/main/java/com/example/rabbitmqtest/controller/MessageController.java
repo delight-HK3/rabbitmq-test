@@ -2,7 +2,7 @@ package com.example.rabbitmqtest.controller;
 
 import com.example.rabbitmqtest.common.response.ApiResponse;
 import com.example.rabbitmqtest.dto.MessageDTO;
-import com.example.rabbitmqtest.service.MesssageService;
+import com.example.rabbitmqtest.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
@@ -19,12 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/publisher")
 public class MessageController {
 
-    private final MesssageService messsageService;
+    private final MessageService messageService;
 
-    public MessageController(MesssageService messsageService) {
-        this.messsageService = messsageService;
+    public MessageController(MessageService messageService) {
+        this.messageService = messageService;
     }
-
 
 
 

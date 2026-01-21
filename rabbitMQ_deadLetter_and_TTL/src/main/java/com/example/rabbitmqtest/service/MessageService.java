@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class MesssageService {
+public class MessageService {
 
     private final RabbitTemplate rabbitTemplate;
     private final RabbitmqExchangeInfo rabbitmqExchangeInfo;
 
-    public MesssageService(RabbitTemplate rabbitTemplate, RabbitmqExchangeInfo rabbitmqExchangeInfo) {
+    public MessageService(RabbitTemplate rabbitTemplate, RabbitmqExchangeInfo rabbitmqExchangeInfo) {
         this.rabbitTemplate = rabbitTemplate;
         this.rabbitmqExchangeInfo = rabbitmqExchangeInfo;
     }
@@ -28,6 +28,8 @@ public class MesssageService {
         try{
             // DTO -> String 직렬화 수행
             String objectToJSON = objectMapper.writeValueAsString(messageDTO);
+
+
 
         } catch (JsonProcessingException ex) {
             log.error("parsing error : {}", ex.getMessage(), ex);
