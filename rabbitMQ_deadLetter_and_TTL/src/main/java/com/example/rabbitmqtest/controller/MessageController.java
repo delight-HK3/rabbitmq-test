@@ -25,6 +25,17 @@ public class MessageController {
         this.messageService = messageService;
     }
 
+    /**
+     * Direct Exchange 방식 메세지 전송
+     *
+     * @param messageDTO 메세지 DTO
+     * @return 메세지 성공 응답
+     */
+    @PostMapping("/direct")
+    public ResponseEntity<ApiResponse> sendDirectMessage(@RequestBody MessageDTO messageDTO) {
+        String resultMessage = messageService.sendDirectMessage(messageDTO);
 
+        return ApiResponse.success(resultMessage,200);
+    }
 
 }
